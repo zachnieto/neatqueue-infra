@@ -12,7 +12,13 @@ locals {
     name      = var.project
     essential = true
     image     = "${aws_ecr_repository.neatqueue.repository_url}:main"
-    portMappings = []
+    portMappings = [
+      {
+        containerPort = 2101
+        hostPort      = 2101
+        protocol      = "tcp"
+      }
+    ]
     logConfiguration = {
       logDriver = "awslogs"
       options = {
