@@ -43,36 +43,8 @@ resource "aws_ecs_task_definition" "tier1" {
   family                   = "${var.project}-t1"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
-  execution_role_arn       = aws_iam_role.task_execution.arn
-  task_role_arn            = aws_iam_role.task_role.arn
-
-  container_definitions = jsonencode([
-    local.common_container
-  ])
-}
-
-resource "aws_ecs_task_definition" "tier2" {
-  family                   = "${var.project}-t2"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = aws_iam_role.task_execution.arn
-  task_role_arn            = aws_iam_role.task_role.arn
-
-  container_definitions = jsonencode([
-    local.common_container
-  ])
-}
-
-resource "aws_ecs_task_definition" "tier3" {
-  family                   = "${var.project}-t3"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = "1024"
-  memory                   = "2048"
   execution_role_arn       = aws_iam_role.task_execution.arn
   task_role_arn            = aws_iam_role.task_role.arn
 
@@ -95,14 +67,6 @@ output "ecs_security_group_id" {
 
 output "task_tier1_arn" {
   value = aws_ecs_task_definition.tier1.arn
-}
-
-output "task_tier2_arn" {
-  value = aws_ecs_task_definition.tier2.arn
-}
-
-output "task_tier3_arn" {
-  value = aws_ecs_task_definition.tier3.arn
 }
 
 

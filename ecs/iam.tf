@@ -53,4 +53,30 @@ resource "aws_iam_role_policy_attachment" "task_role" {
   policy_arn = each.value
 }
 
+# Policy for ECS tasks to access the images S3 bucket
+data "aws_iam_policy_document" "task_s3_images" {
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.images.arn,
+      "${aws_s3_bucket.images.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "task_s3_images" {
+  name   = "${var.project}-ecs-task-s3-images"
+  policy = data.aws_iam_policy_document.task_s3_images.json
+}
+
+resource "aws_iam_role_policy_attachment" "task_s3_images" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.task_s3_images.arn
+}
+
 
