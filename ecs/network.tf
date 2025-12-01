@@ -96,6 +96,15 @@ resource "aws_security_group" "ecs_tasks" {
     description = "Allow healthcheck and API access"
   }
 
+  # Allow SSH for EC2 Instance Connect and debugging
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow SSH for EC2 Instance Connect and debugging"
+  }
+
   # Allow all outbound traffic
   egress {
     from_port   = 0
@@ -108,5 +117,6 @@ resource "aws_security_group" "ecs_tasks" {
     Name = "${var.project}-ecs-tasks"
   }
 }
+
 
 

@@ -79,4 +79,66 @@ resource "aws_iam_role_policy_attachment" "task_s3_images" {
   policy_arn = aws_iam_policy.task_s3_images.arn
 }
 
+# Policy for ECS tasks to manage private instances
+data "aws_iam_policy_document" "task_manager" {
+  statement {
+    actions = [
+      "ecs:CreateService",
+      "ecs:UpdateService",
+      "ecs:DeleteService",
+      "ecs:ListServices",
+      "ecs:DescribeServices",
+      "ecs:RegisterTaskDefinition",
+      "ecs:DescribeTaskDefinition"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "ec2:RunInstances",
+      "ec2:TerminateInstances",
+      "ec2:DescribeInstances",
+      "ec2:StartInstances",
+      "ec2:StopInstances",
+      "ec2:RebootInstances",
+      "ec2:CreateTags"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
+      "secretsmanager:CreateSecret",
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:DeleteSecret",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:neatqueue/instances/*"
+    ]
+  }
+
+  statement {
+    actions = ["iam:PassRole"]
+    resources = [
+      aws_iam_role.task_execution.arn,
+      aws_iam_role.task_role.arn,
+      aws_iam_role.ecs_instance.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "task_manager" {
+  name   = "${var.project}-ecs-task-manager"
+  policy = data.aws_iam_policy_document.task_manager.json
+}
+
+resource "aws_iam_role_policy_attachment" "task_manager" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.task_manager.arn
+}
+
+
 
